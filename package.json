@@ -1,5 +1,6 @@
 {
 	"name": "fcc-api-projects-boilerplate",
+	"author": { "name": "Alejandro Fuentes", "emial": "fuentesra@hotmail.com"},
 	"version": "0.0.1",
 	"description": "An FCC Backend Challenge",
 	"main": "server.js",
@@ -18,7 +19,8 @@
 		"node",
 		"hyperdev",
 		"express",
-		"freecodecamp"
+		"freecodecamp",
+		"alefuentes"
 	],
 	"license": "MIT"
 }
