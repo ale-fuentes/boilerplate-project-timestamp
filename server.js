@@ -4,7 +4,6 @@
 // init project
 var express = require('express');
 var bodyParser = require('body-parser');
-const URL = require('url').URL;
 
 var app = express();
 
@@ -99,7 +98,7 @@ app.post("/api/shorturl/:url?", function (req, res) {
   const isIdUrl = !isNaN(parseFloat(myUrl)) && isFinite(myUrl);
 
   if (!isIdUrl) {
-    if (!stringIsValidUrl(myUrl)) {
+    if (!isURL(myUrl)) {
       res.status(400).json({
         error: 'invalid url'
       });
@@ -155,13 +154,15 @@ app.get("/api/shorturl/:url?", function (req, res) {
 
 });
 
-const stringIsValidUrl = (s) => {
-  try {
-    new URL(s);
-    return true;
-  } catch (err) {
-    return false;
-  }
+const isURL= (str) => {
+  var pattern = new RegExp('^((ft|htt)ps?:\\/\\/)?'+ // protocol
+  '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name and extension
+  '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+  '(\\:\\d+)?'+ // port
+  '(\\/[-a-z\\d%@_.~+&:]*)*'+ // path
+  '(\\?[;&a-z\\d%@_.,~+&:=-]*)?'+ // query string
+  '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+  return pattern.test(str);
 }
 
 app.post("/api/name", function (req, res) {
