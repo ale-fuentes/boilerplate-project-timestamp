@@ -3,7 +3,8 @@
 
 // init project
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const URL = require('url').URL;
 
 var app = express();
 
@@ -66,7 +67,7 @@ app.get("/api/timestamp/:date?", function (req, res) {
 });
 
 app.get("/api/whoami", function (req, res) {
-  
+
   const ipaddress = req.ip;
   const language = req.headers["accept-language"];
   const software = req.headers['user-agent'];
@@ -79,11 +80,13 @@ app.get("/api/whoami", function (req, res) {
 
 });
 
+
+//REST api shorturl
 const mapUrl = new Map();
 var idUrl = 1;
 
-app.post("/api/shorturl/:url?", function(req, res){
-  
+app.post("/api/shorturl/:url?", function (req, res) {
+
   console.log(req.body);
 
   if (!req.body.url) {
@@ -95,12 +98,17 @@ app.post("/api/shorturl/:url?", function(req, res){
   const myUrl = req.body.url;
   const isIdUrl = !isNaN(parseFloat(myUrl)) && isFinite(myUrl);
 
-  if(!isIdUrl){
+  if (!isIdUrl) {
+    if (!stringIsValidUrl(myUrl)) {
+      res.status(400).json({
+        error: 'invalid url'
+      });
+    }
     mapUrl.set(idUrl, myUrl);
-  }else{
+  } else {
     const myRedirect = mapUrl.get(parseInt(myUrl));
 
-    if(myRedirect){
+    if (myRedirect) {
       res.redirect(myRedirect)
     }
 
@@ -110,16 +118,15 @@ app.post("/api/shorturl/:url?", function(req, res){
   }
 
   console.log(mapUrl);
-  
+
   res.json({
     original_url: myUrl,
     short_url: idUrl++
   });
-  
+
 });
 
-
-app.get("/api/shorturl/:url?", function(req, res){
+app.get("/api/shorturl/:url?", function (req, res) {
 
   if (!req.params.url) {
     res.status(400).json({
@@ -130,14 +137,14 @@ app.get("/api/shorturl/:url?", function(req, res){
   const myUrl = req.params.url;
   const isIdUrl = !isNaN(parseFloat(myUrl)) && isFinite(myUrl);
 
-  if(!isIdUrl){
+  if (!isIdUrl) {
     res.status(400).json({
       error: 'invalid url'
     });
-  }else{
+  } else {
     const myRedirect = mapUrl.get(parseInt(myUrl));
 
-    if(myRedirect){
+    if (myRedirect) {
       res.redirect(myRedirect)
     }
 
@@ -148,7 +155,16 @@ app.get("/api/shorturl/:url?", function(req, res){
 
 });
 
-app.post("/api/name", function(req, res) {
+const stringIsValidUrl = (s) => {
+  try {
+    new URL(s);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+app.post("/api/name", function (req, res) {
   // Handle the data in the request
   var string = req.body.first + " " + req.body.last;
   res.json({ name: string });
