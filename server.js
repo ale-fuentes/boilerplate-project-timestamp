@@ -3,7 +3,12 @@
 
 // init project
 var express = require('express');
+var bodyParser = require('body-parser')
+
 var app = express();
+
+// parse application/json
+app.use(bodyParser.json());
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -69,6 +74,52 @@ app.get("/api/whoami", function (req, res) {
     software: software
   });
 
+});
+
+const mapUrl = new Map();
+var idUrl = 1;
+
+app.post("/api/shorturl/:url?", function(req, res){
+  
+  //console.log(req.body);
+
+  if (!req.body.url) {
+    res.status(400).json({
+      error: 'invalid url'
+    });
+  }
+
+  const myUrl = req.body.url;
+  const isIdUrl = !isNaN(parseFloat(myUrl)) && isFinite(myUrl);
+
+  if(!isIdUrl){
+    mapUrl.set(idUrl, myUrl);
+  }else{
+    const myRedirect = mapUrl.get(parseInt(myUrl));
+
+    if(myRedirect){
+      res.redirect(myRedirect)
+    }
+
+    res.status(400).json({
+      error: 'invalid url'
+    });
+  }
+
+  //console.log(mapUrl);
+  
+  res.json({
+    original_url: myUrl,
+    short_url: idUrl++
+  });
+  
+});
+
+
+app.post("/api/name", function(req, res) {
+  // Handle the data in the request
+  var string = req.body.first + " " + req.body.last;
+  res.json({ name: string });
 });
 
 // listen for requests :)
