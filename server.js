@@ -27,7 +27,7 @@ app.get("/api/hello", function (req, res) {
 app.get("/api/:date?", function (req, res) {
 
   //if param are empty, them use current date.
-  if(Object.keys(req.params).length === 0){
+  if(!req.params.date){
     var dateUnix = Date.now().valueOf();
     var dateUTC = new Date().toUTCString();
     res.json({
