@@ -9,6 +9,9 @@ var app = express();
 
 // parse application/json
 app.use(bodyParser.json());
+app.use(express.urlencoded({
+  extended: true
+}));
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -81,7 +84,7 @@ var idUrl = 1;
 
 app.post("/api/shorturl/:url?", function(req, res){
   
-  //console.log(req.body);
+  console.log(req.body);
 
   if (!req.body.url) {
     res.status(400).json({
@@ -106,7 +109,7 @@ app.post("/api/shorturl/:url?", function(req, res){
     });
   }
 
-  //console.log(mapUrl);
+  console.log(mapUrl);
   
   res.json({
     original_url: myUrl,
@@ -115,6 +118,35 @@ app.post("/api/shorturl/:url?", function(req, res){
   
 });
 
+
+app.get("/api/shorturl/:url?", function(req, res){
+
+  if (!req.params.url) {
+    res.status(400).json({
+      error: 'invalid url'
+    });
+  }
+
+  const myUrl = req.params.url;
+  const isIdUrl = !isNaN(parseFloat(myUrl)) && isFinite(myUrl);
+
+  if(!isIdUrl){
+    res.status(400).json({
+      error: 'invalid url'
+    });
+  }else{
+    const myRedirect = mapUrl.get(parseInt(myUrl));
+
+    if(myRedirect){
+      res.redirect(myRedirect)
+    }
+
+    res.status(400).json({
+      error: 'invalid url'
+    });
+  }
+
+});
 
 app.post("/api/name", function(req, res) {
   // Handle the data in the request
